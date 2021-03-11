@@ -27,10 +27,10 @@ window.addEventListener('DOMContentLoaded', () => {
     hideTabContent();
     showTabContent();
 
-    tabsparent.addEventListener('click', (event) => {
-        if (event.target && event.target.classList.contains('tabheader__item') ) {
+    tabsparent.addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('tabheader__item') ) {
             tabs.forEach((item,i) => {
-                if (event.target == item){
+                if (e.target == item){
                     hideTabContent();
                     showTabContent(i);
                 }
@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     //-----------------------------------------------------------------------------------
     //timer
-    const deadline = '2021-03-11 14:00';
+    const deadline = '2021-03-12 09:00';
     const timeBlock = '.timer';
 
     // опредление оставшегося времени
@@ -90,6 +90,7 @@ window.addEventListener('DOMContentLoaded', () => {
         } 
     }
 
+    // установка текстовой даты конца акции
     function setTextEndPromotion(endtime) {
         const textend = document.querySelector('#text-end-promotion');
         const timeend = new Date(endtime);
@@ -97,7 +98,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const day = timeend.getDate();
         const hour = timeend.getHours();
         const minute = timeend.getMinutes();
-        const arrMohts = [
+        const arrMonths = [
             'января',
             'февраля',
             'марта',
@@ -111,7 +112,7 @@ window.addEventListener('DOMContentLoaded', () => {
             'ноября',
             'декабря'
         ]; 
-        month = arrMohts[month];
+        month = arrMonths[month];
         textend.textContent = `Акция закончится ${day} ${month} в ${setZero(hour)}:${setZero(minute)}`;
     }
 
@@ -186,7 +187,54 @@ window.addEventListener('DOMContentLoaded', () => {
         showSlideImage(currentNumImage-1);
     }, 8000);
     //-----------------------------------------------------------------------------------
+    // модально окно связи
+    const openModal = document.querySelectorAll('[data-modal-open]');
+    const modalWindow = document.querySelector('div.modal');
+    const closeModal =document.querySelector('[data-model-close]');
 
+    // вызов модального окна
+    function openModalWindow () {
+        modalWindow.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        clearTimeout(autoOpenModal);
+    }
+    openModal.forEach(item => {
+        item.addEventListener('click', openModalWindow);});
+
+    //закрытие модального окна
+    function closeModalWindow () {
+        modalWindow.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    closeModal.addEventListener('click', closeModalWindow);
+
+    // закрытие кликом вне окна
+    modalWindow.addEventListener('click', (e) => {
+        if (e.target.classList == 'modal') {
+            closeModalWindow();
+        }
+    });
+
+    // закрытие кнопкой esc
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape' && modalWindow.style.display != 'none') {
+            closeModalWindow();
+        }
+    });
+
+    // открытие модального окна автоматически через 20 секунд
+    const autoOpenModal = setTimeout(openModalWindow, 20000);
+
+    // открытие моадльного окна при пролистывании до конца
+    let i = 0;
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset + document.documentElement.clientHeight == document.documentElement.scrollHeight && i == 0){
+            i++;
+            openModalWindow();
+        }
+    });
+
+    //-----------------------------------------------------------------------------------
     
 
 
