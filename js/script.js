@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     //-----------------------------------------------------------------------------------
     //timer
-    const deadline = '2021-03-12 09:00';
+    const deadline = '2021-03-12 18:00';
     const timeBlock = '.timer';
 
     // опредление оставшегося времени
@@ -80,7 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    // установка нуля для таймера если единичное число
+    // установка нуля для однозначного числа
     function setZero(num) {
         if (num >= 0 && Math.trunc(num / 10) >= 1) {
             return num;
@@ -233,12 +233,84 @@ window.addEventListener('DOMContentLoaded', () => {
             openModalWindow();
         }
     });
-
     //-----------------------------------------------------------------------------------
+    // меню
+    class MenuItem {
+        constructor (imageUrl, subtitle, menuinfo, price, container) {
+            this.imageUrl = imageUrl;
+            this.subtitle = subtitle;
+            this.menuinfo = menuinfo;
+            this.price = price;
+            this.container = document.querySelector(container);
+        }
+
+        createMenuItem () {
+            //создание элементов
+            const divMenuItem = document.createElement('div');
+            const imgMenuItem = document.createElement('img');
+            const h3MenuSubtitle = document.createElement('h3');
+            const divMenuInfo = document.createElement('div');
+            const divMenuDivider = document.createElement('div');
+            const divMenuPrice = document.createElement('div');
+            const divMenuCost = document.createElement('div');
+            const divMenuTotal = document.createElement('div');
+            const spanMenuTotal = document.createElement('span');
+            
+            //добавление классов 
+            divMenuItem.classList.add('menu__item');
+            h3MenuSubtitle.classList.add('menu__item-subtitle');
+            divMenuInfo.classList.add('menu__item-descr');
+            divMenuDivider.classList.add('menu__item-divider');
+            divMenuPrice.classList.add('menu__item-price');
+            divMenuCost.classList.add('menu__item-cost');
+            divMenuTotal.classList.add('menu__item-total');
+            
+            //вложение элемнтов
+            divMenuItem.append(imgMenuItem);
+            divMenuItem.append(h3MenuSubtitle);
+            divMenuItem.append(divMenuInfo);
+            divMenuItem.append(divMenuDivider);
+            divMenuItem.append(divMenuPrice);
+            divMenuPrice.append(divMenuCost);
+            divMenuPrice.append(divMenuTotal);
+            
+            
+            // наполнение меню
+            imgMenuItem.src = this.imageUrl;
+            h3MenuSubtitle.textContent = this.subtitle;
+            divMenuInfo.textContent = this.menuinfo;
+            divMenuCost.textContent = 'Цена';
+            divMenuTotal.textContent = ' руб/день';
+            spanMenuTotal.textContent = this.price;
+            divMenuTotal.prepend(spanMenuTotal);
+            
+            //вставка в нужное место
+            this.container.append(divMenuItem);
+        }
+    }
+    // путь влажения меню
+    const menuField = document.querySelector('div.menu__field');
+    const menuContainer = menuField.querySelector('div.container');
+    // создание самих меню
+    const menuVegy = new MenuItem('img/tabs/vegy.jpg',
+                                    'Меню "Фитнес"',
+                                    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+                                    '229',
+                                    '.menu .container').createMenuItem();
+
+    const menuElite = new MenuItem('img/tabs/elite.jpg',
+                                    'Меню “Премиум”',
+                                    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+                                    '540',
+                                    '.menu .container').createMenuItem();
+
+    const menuPost = new MenuItem('img/tabs/post.jpg',
+                                    'Меню "Постное"',
+                                    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+                                    '480',
+                                    '.menu .container').createMenuItem();
+
     
-
-
-
-
+    //-----------------------------------------------------------------------------------
 
 });
