@@ -333,32 +333,35 @@ window.addEventListener('DOMContentLoaded', () => {
                 const statusMessage = document.createElement('img');
                 statusMessage.src = message.loading;
                 statusMessage.style.cssText = `
-                    display: block;
-                    margin: 0 auto;
+                display: block;
+                margin: 0 auto;
                 `;
-                form.insertAdjacentElemnt('afterend', statusMessage);
-    
-                const request = new XMLHttpRequest();
-                request.open('POST', 'server.php');
-                request.setRequestHeader('Content-type', 'application/json');
+                form.insertAdjacentElement('afterend', statusMessage);
+
                 const formData = new FormData(form);
                 const object = {};
                 formData.forEach((item, i) => {
                     object[i] = item;
                 });
-                const json = JSON.stringify(object);
-                console.log(json);
-                request.send(json);
-                
-                request.addEventListener('load', () => {
-                    if (request.status === 200) {
-                        console.log(request.response);
-                        showThanksModal(message.success);
-                        form.reset();
-                        statusMessage.remove();
-                    } else {
-                        showThanksModal(message.failure);
+            
+
+                fetch('server.php', {
+                    method: 'POST',
+                    body: JSON.stringify(object),
+                    heeaders: {
+                        'Content-type': 'application/json'
                     }
+                })
+                .then(data => data.text())
+                .then(data => {
+                    console.log(data);
+                    showThanksModal(message.success);
+                    form.reset();
+                    statusMessage.remove();
+                }).catch(() => {
+                    showThanksModal(message.failure);
+                }).finally(() => {
+                    form.reset();
                 });
             });
     
