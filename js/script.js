@@ -1,5 +1,7 @@
 'use strict';
 
+// const { Console } = require("node:console");
+
 window.addEventListener('DOMContentLoaded', () => {
 
     //----------------------------------------------------------------------
@@ -120,6 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimer(timeBlock, deadline);
     //-----------------------------------------------------------------------------------
     // карусель картинок
+    const slider =document.querySelector('.offer__slider');
     const slidecounter = document.querySelector('.offer__slider-counter');
     const btnLeft = slidecounter.querySelector('.offer__slider-prev');
     const btnRight = slidecounter.querySelector('.offer__slider-next');
@@ -127,65 +130,98 @@ window.addEventListener('DOMContentLoaded', () => {
     const totalImage = slidecounter.querySelector('#total');
     const slidewrapper = document.querySelector('.offer__slider-wrapper');
     const slideImage = slidewrapper.querySelectorAll('.offer__slide');
-
-    hideSlideImage();
-    showSlideImage();
+    const slideInner = slidewrapper.querySelector('.offer__slider-inner');
+    const widthWrapper = window.getComputedStyle(slidewrapper).width;
+    let slideIndex = 1;
+    let offset = 0;
 
     totalImage.textContent = setZero(slideImage.length);
+    numImage.textContent = setZero(slideIndex);
 
-    // скрытие всех картинок
-    function hideSlideImage () {
-        slideImage.forEach(item => {
-            item.classList.add('hide');
-            item.classList.remove('show');
+    slideInner.style.width = 100 * slideImage.length + '%';
+    slideInner.style.display = 'flex';
+    slideInner.style.transition = '0.5s all';
+
+    slidewrapper.style.overflow = 'hidden';
+
+    slideImage.forEach(slide => {
+        slide.style.width = widthWrapper;
+    });
+
+    // отображение выбраннго изображения на слайдере
+    slider.style.position = 'relative';
+    const divMoveDots = document.createElement('div');
+    divMoveDots.classList.add('carousel-indicators');
+    slider.append(divMoveDots);
+
+    slideImage.forEach(() => {
+        const moveDot = document.createElement('div');
+        moveDot.classList.add('dot');
+        divMoveDots.append(moveDot);
+    });
+    
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, num) => {
+        dotOfImage(dot, num);
+    });
+    dots[slideIndex-1].style.opacity = '1';
+
+    // изменение слайда нажатием на dot
+    function dotOfImage(dot, num) {
+        dot.addEventListener('click', () => {
+            dots.forEach((item) => {
+                item.style.opacity = '0.5';
+            });
+            offset = +widthWrapper.slice(0, widthWrapper.length - 2) * (num);
+            dots[num].style.opacity = '1';
+            slideIndex = num + 1;
+            numImage.textContent = setZero(slideIndex);
+            slideInner.style.transform = `translateX(-${offset}px)`;
         });
     }
-    
-    // показ нужной картинки
-    function showSlideImage (num = 0) {
-        slideImage[num].classList.add('show');
-        slideImage[num].classList.remove('hide');
-        numImage.textContent = setZero(num + 1);
-    }
-    
-    // нажатие стрелочки влево
-    btnLeft.addEventListener('click', () => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == 1) {
-            currentNumImage = totalNumImage;
-        } else {
-            currentNumImage--;
+
+    // перемещение вправо или влево
+    function moveSlide(param) {
+        dots.forEach((item) => {
+            item.style.opacity = '0.5';
+        });
+        if (param == 'right') {
+            if (offset == +widthWrapper.slice(0, widthWrapper.length - 2) * (slideImage.length -1)) {
+                offset = 0;
+                slideIndex = 1;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            } else {
+                offset += +widthWrapper.slice(0, widthWrapper.length - 2);
+                slideIndex++;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            }
+        } else if (param == 'left') {
+            if (offset == 0) {
+                offset = +widthWrapper.slice(0, widthWrapper.length - 2) * (slideImage.length -1);
+                slideIndex = slideImage.length;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            } else {
+                offset -= +widthWrapper.slice(0, widthWrapper.length - 2);
+                slideIndex--;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            }
         }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    });
+        slideInner.style.transform = `translateX(-${offset}px)`;
+    }
 
     // нажатие стрелочки вправо
-    btnRight.addEventListener('click', () => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == totalNumImage) {
-            currentNumImage = 1;
-        } else {
-            currentNumImage++;
-        }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    });
+    btnRight.addEventListener('click', () =>  moveSlide('right'));
+
+    // нажатие стрелочки влево
+    btnLeft.addEventListener('click', () => moveSlide('left'));
 
     // автоматическая карусель
-    const autoSlide = setInterval(() => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == totalNumImage) {
-            currentNumImage = 1;
-        } else {
-            currentNumImage++;
-        }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    }, 8000);
+    const autoSlide = setInterval( () =>  moveSlide('right'), 8000);
+
     //-----------------------------------------------------------------------------------
     // модально окно связи
     const openModal = document.querySelectorAll('[data-modal-open]');
@@ -390,6 +426,9 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
         }
+
+
+
         //-----------------------------------------------------------------------------------
 
 });
