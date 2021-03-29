@@ -483,10 +483,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const choosePersonData = document.querySelector('#persone-data');
     const personData = choosePersonData.querySelectorAll('.calculating__choose-item')
 
-    
-    // || !height || !weight || !age 
+     
     function calcTotalResult () {
-        if (!sex || !ratio) {
+        if (!sex || !height || !weight || !age || !ratio) {
             calcResult.textContent = '0';
             return;
         }
