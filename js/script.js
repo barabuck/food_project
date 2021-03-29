@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     //-----------------------------------------------------------------------------------
     //timer
-    const deadline = '2021-03-12 18:00';
+    const deadline = '2021-05-31 23:59';
     const timeBlock = '.timer';
 
     // опредление оставшегося времени
@@ -472,10 +472,85 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             
         }
+    //-----------------------------------------------------------------------------------
+    // калькулятор
+    const calcResult = document.querySelector('.calculating__result span');
+    let sex, height, weight, age, ratio;
+    const chooseGender = document.querySelector('#gender');
+    const gender = chooseGender.querySelectorAll('.calculating__choose-item');
+    const chooseRatio = document.querySelector('#ratio');
+    const chRatio = chooseRatio.querySelectorAll('.calculating__choose-item');
+    const choosePersonData = document.querySelector('#persone-data');
+    const personData = choosePersonData.querySelectorAll('.calculating__choose-item')
 
+    
+    // || !height || !weight || !age 
+    function calcTotalResult () {
+        if (!sex || !ratio) {
+            calcResult.textContent = '0';
+            return;
+        }
+        if (sex == 'female') {
+            calcResult.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio); // female
+        } else if (sex == 'male') {
+            calcResult.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio); // male
+        }
+    }
 
+    function removeChooseGender () {
+        gender.forEach(item => {
+            item.classList.remove('calculating__choose-item_active');
+        });
+    }
 
-        //-----------------------------------------------------------------------------------
+    function removeChooseRatio () {
+        chRatio.forEach(item => {
+            item.classList.remove('calculating__choose-item_active');
+        });
+    }
+
+    chRatio.forEach(itRatio => {
+        itRatio.addEventListener('click', () => {
+            removeChooseRatio();
+            itRatio.classList.add('calculating__choose-item_active');
+            ratio = itRatio.getAttribute('data-ratio');
+            if (height && weight && age) {
+                calcTotalResult();
+            } 
+        });
+    });
+
+    gender.forEach(gender => {
+        gender.addEventListener('click', (e) => {
+            removeChooseGender();
+            gender.classList.add('calculating__choose-item_active');
+            sex = e.target.id;
+            if (height && weight && age) {
+                calcTotalResult();
+            } 
+        });
+    });
+
+    personData.forEach(input => {
+        input.addEventListener('input', (e) => {
+            if (e.target.id == 'height') {
+                height = input.value;
+            } else if (e.target.id == 'weight') {
+                weight = input.value;
+            } else if (e.target.id == 'age') {
+                age = input.value;
+            }
+            if (height && weight && age) {
+                calcTotalResult();
+            } 
+        });
+    });
+
+    calcTotalResult();
+    removeChooseGender();
+    removeChooseRatio();
+
+    //-----------------------------------------------------------------------------------
 
    
 });
