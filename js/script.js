@@ -1,5 +1,7 @@
 'use strict';
 
+// const { Console } = require("node:console");
+
 window.addEventListener('DOMContentLoaded', () => {
 
     //----------------------------------------------------------------------
@@ -220,6 +222,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // автоматическая карусель
     const autoSlide = setInterval( () =>  moveSlide('right'), 8000);
 
+<<<<<<< HEAD
     // hideSlideImage();
     // showSlideImage();
 
@@ -269,6 +272,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // // автоматическая карусель
     // const autoSlide = setInterval( () => moveSlide('right'), 8000);
+=======
+>>>>>>> bccc7b686f661f3824b16afbc6d1204c6e4cf44d
     //-----------------------------------------------------------------------------------
     // модально окно связи
     const openModal = document.querySelectorAll('[data-modal-open]');
@@ -382,6 +387,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const menuContainer = menuField.querySelector('div.container');
     // создание самих меню
     let dbMenu;
+<<<<<<< HEAD
+=======
+
+    axios.get('http://localhost:3000/menu')
+        .then(data => {
+            data.data.forEach(obj => {
+                new MenuItem(obj.img, obj.title, obj.descr, obj.price, '.menu .container').createMenuItem();
+            });
+        });
+>>>>>>> bccc7b686f661f3824b16afbc6d1204c6e4cf44d
 
     // const getResource = async (url) => {
     //     const res = await fetch(url);
@@ -408,6 +423,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         });
     //-----------------------------------------------------------------------------------
+<<<<<<< HEAD
     // формы
     const forms = document.querySelectorAll('form');
 
@@ -489,6 +505,92 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     //-----------------------------------------------------------------------------------
 
+=======
+        // формы
+        const forms = document.querySelectorAll('form');
+
+        const message = {
+            loading: 'img/form/spinner.svg',
+            success: 'Success',
+            failure: 'Error'
+        };
+    
+        // привязка функционала к каждой форме
+        forms.forEach((item) => {
+            bindpostData(item);
+        });
+
+        const postData = async (url, data) => {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: data
+            });
+    
+            return await res.json();
+        };
+    
+    
+        // отправка запроса на сервер
+        function bindpostData(form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const statusMessage = document.createElement('img');
+                statusMessage.src = message.loading;
+                statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+                `;
+                form.insertAdjacentElement('afterend', statusMessage);
+
+                const formData = new FormData(form);
+                const json = JSON.stringify(Object.fromEntries(formData.entries()));
+                
+                postData('http://localhost:3000/requests', json )
+                .then(data => {
+                    // console.log(data);
+                    showThanksModal(message.success);
+                    form.reset();
+                    statusMessage.remove();
+                }).catch(() => {
+                    showThanksModal(message.failure);
+                }).finally(() => {
+                    form.reset();
+                });
+            });
+    
+            //создание окна ответа формы
+            function showThanksModal(message) {
+                const modelDialog = document.querySelector('.modal__dialog');
+                modelDialog.classList.add('hide');
+                openModalWindow();
+                const thanksModal = document.createElement('div');
+                thanksModal.classList.add('modal__dialog');
+                thanksModal.innerHTML = `
+                    <div class="modal__content"> 
+                        <div data-model-close class="modal__close" >&times;</div>
+                        <div class="modal__title">${message}</div>
+                    </div>
+                `;
+    
+                document.querySelector('.modal').append(thanksModal);
+    
+                setTimeout(() => {
+                    thanksModal.remove();
+                    modelDialog.classList.add('show');
+                    modelDialog.classList.remove('hide');
+                    closeModalWindow();
+                }, 4000);
+            }
+            
+        }
+
+
+
+        //-----------------------------------------------------------------------------------
+>>>>>>> bccc7b686f661f3824b16afbc6d1204c6e4cf44d
 
    
 });
