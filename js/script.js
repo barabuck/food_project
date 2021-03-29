@@ -120,6 +120,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimer(timeBlock, deadline);
     //-----------------------------------------------------------------------------------
     // карусель картинок
+    const slider =document.querySelector('.offer__slider');
     const slidecounter = document.querySelector('.offer__slider-counter');
     const btnLeft = slidecounter.querySelector('.offer__slider-prev');
     const btnRight = slidecounter.querySelector('.offer__slider-next');
@@ -127,65 +128,147 @@ window.addEventListener('DOMContentLoaded', () => {
     const totalImage = slidecounter.querySelector('#total');
     const slidewrapper = document.querySelector('.offer__slider-wrapper');
     const slideImage = slidewrapper.querySelectorAll('.offer__slide');
-
-    hideSlideImage();
-    showSlideImage();
+    const slideInner = slidewrapper.querySelector('.offer__slider-inner');
+    const widthWrapper = window.getComputedStyle(slidewrapper).width;
+    let slideIndex = 1;
+    let offset = 0;
 
     totalImage.textContent = setZero(slideImage.length);
+    numImage.textContent = setZero(slideIndex);
 
-    // скрытие всех картинок
-    function hideSlideImage () {
-        slideImage.forEach(item => {
-            item.classList.add('hide');
-            item.classList.remove('show');
+    slideInner.style.width = 100 * slideImage.length + '%';
+    slideInner.style.display = 'flex';
+    slideInner.style.transition = '0.5s all';
+
+    slidewrapper.style.overflow = 'hidden';
+
+    slideImage.forEach(slide => {
+        slide.style.width = widthWrapper;
+    });
+
+    // отображение выбраннго изображения на слайдере
+    slider.style.position = 'relative';
+    const divMoveDots = document.createElement('div');
+    divMoveDots.classList.add('carousel-indicators');
+    slider.append(divMoveDots);
+
+    slideImage.forEach(() => {
+        const moveDot = document.createElement('div');
+        moveDot.classList.add('dot');
+        divMoveDots.append(moveDot);
+    });
+    
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, num) => {
+        dotOfImage(dot, num);
+    });
+    dots[slideIndex-1].style.opacity = '1';
+
+    // изменение слайда нажатием на dot
+    function dotOfImage(dot, num) {
+        dot.addEventListener('click', () => {
+            dots.forEach((item) => {
+                item.style.opacity = '0.5';
+            });
+            offset = +widthWrapper.slice(0, widthWrapper.length - 2) * (num);
+            dots[num].style.opacity = '1';
+            slideIndex = num + 1;
+            numImage.textContent = setZero(slideIndex);
+            slideInner.style.transform = `translateX(-${offset}px)`;
         });
     }
-    
-    // показ нужной картинки
-    function showSlideImage (num = 0) {
-        slideImage[num].classList.add('show');
-        slideImage[num].classList.remove('hide');
-        numImage.textContent = setZero(num + 1);
-    }
-    
-    // нажатие стрелочки влево
-    btnLeft.addEventListener('click', () => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == 1) {
-            currentNumImage = totalNumImage;
-        } else {
-            currentNumImage--;
+
+    // перемещение вправо или влево
+    function moveSlide(param) {
+        dots.forEach((item) => {
+            item.style.opacity = '0.5';
+        });
+        if (param == 'right') {
+            if (offset == +widthWrapper.slice(0, widthWrapper.length - 2) * (slideImage.length -1)) {
+                offset = 0;
+                slideIndex = 1;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            } else {
+                offset += +widthWrapper.slice(0, widthWrapper.length - 2);
+                slideIndex++;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            }
+        } else if (param == 'left') {
+            if (offset == 0) {
+                offset = +widthWrapper.slice(0, widthWrapper.length - 2) * (slideImage.length -1);
+                slideIndex = slideImage.length;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            } else {
+                offset -= +widthWrapper.slice(0, widthWrapper.length - 2);
+                slideIndex--;
+                numImage.textContent = setZero(slideIndex);
+                dots[slideIndex-1].style.opacity = '1';
+            }
         }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    });
+        slideInner.style.transform = `translateX(-${offset}px)`;
+    }
 
     // нажатие стрелочки вправо
-    btnRight.addEventListener('click', () => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == totalNumImage) {
-            currentNumImage = 1;
-        } else {
-            currentNumImage++;
-        }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    });
+    btnRight.addEventListener('click', () =>  moveSlide('right'));
+
+    // нажатие стрелочки влево
+    btnLeft.addEventListener('click', () => moveSlide('left'));
 
     // автоматическая карусель
-    const autoSlide = setInterval(() => {
-        let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
-        const totalNumImage = +setZero(slideImage.length);
-        if (currentNumImage == totalNumImage) {
-            currentNumImage = 1;
-        } else {
-            currentNumImage++;
-        }
-        hideSlideImage();
-        showSlideImage(currentNumImage-1);
-    }, 8000);
+    const autoSlide = setInterval( () =>  moveSlide('right'), 8000);
+
+    // hideSlideImage();
+    // showSlideImage();
+
+    // totalImage.textContent = setZero(slideImage.length);
+
+    // // скрытие всех картинок
+    // function hideSlideImage () {
+    //     slideImage.forEach(item => {
+    //         item.classList.add('hide');
+    //         item.classList.remove('show');
+    //     });
+    // }
+    
+    // // показ нужной картинки
+    // function showSlideImage (num = 0) {
+    //     slideImage[num].classList.add('show');
+    //     slideImage[num].classList.remove('hide');
+    //     numImage.textContent = setZero(num + 1);
+    // }
+    
+    // // перемещение вправо или влево
+    // function moveSlide(param) {
+    //     let currentNumImage = +(slidecounter.querySelector('#current')).textContent;
+    //     const totalNumImage = +setZero(slideImage.length);
+    //     if (param == 'left') {
+    //         if (currentNumImage == 1) {
+    //             currentNumImage = totalNumImage;
+    //         } else {
+    //             currentNumImage--;
+    //         }
+    //     } else if (param == 'right') {
+    //         if (currentNumImage == totalNumImage) {
+    //             currentNumImage = 1;
+    //         } else {
+    //             currentNumImage++;
+    //         }
+    //     }
+    //     hideSlideImage();
+    //     showSlideImage(currentNumImage-1);
+    // }
+
+    // // нажатие стрелочки влево
+    // btnLeft.addEventListener('click', () => moveSlide('left'));
+
+    // // нажатие стрелочки вправо
+    // btnRight.addEventListener('click', () =>  moveSlide('right'));
+
+    // // автоматическая карусель
+    // const autoSlide = setInterval( () => moveSlide('right'), 8000);
     //-----------------------------------------------------------------------------------
     // модально окно связи
     const openModal = document.querySelectorAll('[data-modal-open]');
@@ -206,11 +289,11 @@ window.addEventListener('DOMContentLoaded', () => {
         modalWindow.style.display = 'none';
         document.body.style.overflow = '';
     }
-    closeModal.addEventListener('click', closeModalWindow);
+    // closeModal.addEventListener('click', closeModalWindow);
 
     // закрытие кликом вне окна
     modalWindow.addEventListener('click', (e) => {
-        if (e.target.classList == 'modal') {
+        if (e.target.classList == 'modal' || e.target.getAttribute('data-model-close') == '') {
             closeModalWindow();
         }
     });
@@ -242,6 +325,12 @@ window.addEventListener('DOMContentLoaded', () => {
             this.menuinfo = menuinfo;
             this.price = price;
             this.container = document.querySelector(container);
+            this.transfer = 27;
+            this.changeToUAH(); 
+        }
+
+        changeToUAH() {
+            this.price = this.price * this.transfer; 
         }
 
         createMenuItem () {
@@ -292,25 +381,114 @@ window.addEventListener('DOMContentLoaded', () => {
     const menuField = document.querySelector('div.menu__field');
     const menuContainer = menuField.querySelector('div.container');
     // создание самих меню
-    const menuVegy = new MenuItem('img/tabs/vegy.jpg',
-                                    'Меню "Фитнес"',
-                                    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-                                    '229',
-                                    '.menu .container').createMenuItem();
+    let dbMenu;
 
-    const menuElite = new MenuItem('img/tabs/elite.jpg',
-                                    'Меню “Премиум”',
-                                    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-                                    '540',
-                                    '.menu .container').createMenuItem();
+    // const getResource = async (url) => {
+    //     const res = await fetch(url);
 
-    const menuPost = new MenuItem('img/tabs/post.jpg',
-                                    'Меню "Постное"',
-                                    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-                                    '480',
-                                    '.menu .container').createMenuItem();
+    //     if (!res.ok) {
+    //        throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    //     }
 
-    
+    //     return await res.json();
+    // };
+
+    // getResource('http://localhost:3000/menu')
+    //     .then(data => {
+    //         console.log(data);
+    //         data.forEach(obj => {
+    //                     new MenuItem(obj.img, obj.title, obj.descr, obj.price, '.menu .container').createMenuItem();
+    //                 });
+    //     });
+
+    axios.get('http://localhost:3000/menu')
+        .then(data => {
+            data.data.forEach(obj => {
+                new MenuItem(obj.img, obj.title, obj.descr, obj.price, '.menu .container').createMenuItem();
+            });
+        });
+    //-----------------------------------------------------------------------------------
+    // формы
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'img/form/spinner.svg',
+        success: 'Success',
+        failure: 'Error'
+    };
+
+    // привязка функционала к каждой форме
+    forms.forEach((item) => {
+        bindpostData(item);
+    });
+
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data
+        });
+
+        return await res.json();
+    };
+
+    // отправка запроса на сервер
+    function bindpostData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `;
+            form.insertAdjacentElement('afterend', statusMessage);
+
+            const formData = new FormData(form);
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+            
+            postData('http://localhost:3000/requests', json )
+            .then(data => {
+                // console.log(data);
+                showThanksModal(message.success);
+                form.reset();
+                statusMessage.remove();
+            }).catch(() => {
+                showThanksModal(message.failure);
+            }).finally(() => {
+                form.reset();
+            });
+        });
+
+        //создание окна ответа формы
+        function showThanksModal(message) {
+            const modelDialog = document.querySelector('.modal__dialog');
+            modelDialog.classList.add('hide');
+            openModalWindow();
+            const thanksModal = document.createElement('div');
+            thanksModal.classList.add('modal__dialog');
+            thanksModal.innerHTML = `
+                <div class="modal__content"> 
+                    <div data-model-close class="modal__close" >&times;</div>
+                    <div class="modal__title">${message}</div>
+                </div>
+            `;
+
+            document.querySelector('.modal').append(thanksModal);
+
+            setTimeout(() => {
+                thanksModal.remove();
+                modelDialog.classList.add('show');
+                modelDialog.classList.remove('hide');
+                closeModalWindow();
+            }, 4000);
+        }
+        
+    }
     //-----------------------------------------------------------------------------------
 
+
+   
 });
